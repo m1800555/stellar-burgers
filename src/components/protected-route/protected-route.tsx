@@ -21,24 +21,12 @@ export function ProtectedRoute({ children, onlyUnauthorized }: ProtectedRoutePro
   }
 
   if (onlyUnauthorized && user) {
-    const { from } = location.state || { from: { pathname: '/' } };
-    return <Navigate to={from} />;
-  }
+    const from  = location.state?.from || { pathname: '/' };
+    return <Navigate replace to={from} />;
+  }  
 
   if (!onlyUnauthorized && !user) {
-    return (
-      <Navigate
-        replace
-        to={'/login'}
-        state={{
-          from: {
-            ...location,
-            background: location.state?.background,
-            state: null
-          }
-        }}
-      />
-    );
+    return <Navigate replace to='/login' state={{ from: location }} />;
   }
 
   return children;

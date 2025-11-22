@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, SerializedError } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import {
   TLoginData,
@@ -16,7 +16,7 @@ type TUserState = {
   isAuthChecked: boolean;
   isAuthenticated: boolean;
   requestStatus: TRequestStatus;
-  error?: SerializedError;
+  error: string | undefined;
 };
 
 export const initialState: TUserState = {
@@ -24,20 +24,17 @@ export const initialState: TUserState = {
   isAuthChecked: false,
   isAuthenticated: false,
   requestStatus: 'idle',
+  error: undefined,
 };
 
 export const getUser = createAsyncThunk(
   'users/getUser',
   async (_, { rejectWithValue }) => {
-    try {
-      const response = await getUserApi();
-      if (!response.success) {
-        return rejectWithValue(response);
-      }
-      return response.user;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    const response = await getUserApi();
+    if (!response.success) {
+      return rejectWithValue(response);
     }
+    return response.user;
   }
 );
 
@@ -110,46 +107,55 @@ const slice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getUser.fulfilled, (state, action) => {
-        state.user = action.payload;
+      .addCase(getUser.fulfilled, (state, { payload }) => {
+        state.user = payload;
         state.isAuthChecked = true;
         state.isAuthenticated = true;
         state.requestStatus = 'succeeded';
+        state.error = undefined;
       })
-      .addCase(getUser.rejected, (state, action) => {
+      .addCase(getUser.rejected, (state, { error }) => {
         state.isAuthChecked = true;
-        state.error = action.meta.rejectedWithValue
-          ? (action.payload as SerializedError)
-          : action.error;
         state.requestStatus = 'failed';
+        if (error.message) {
+          state.error = error.message;
+        }
       })
       .addCase(getUser.pending, (state) => {
         state.requestStatus = 'pending';
       });
 
     builder
-      .addCase(registerUser.fulfilled, (state, action) => {
-        state.user = action.payload;
+      .addCase(registerUser.fulfilled, (state, { payload }) => {
+        state.user = payload;
         state.isAuthenticated = true;
         state.isAuthChecked = true;
         state.requestStatus = 'succeeded';
+        state.error = undefined;
       })
-      .addCase(registerUser.rejected, (state, action) => {
+      .addCase(registerUser.rejected, (state, { error }) => {
         state.requestStatus = 'failed';
+        if (error.message) {
+          state.error = error.message;
+        }
       })
       .addCase(registerUser.pending, (state) => {
         state.requestStatus = 'pending';
       });
 
     builder
-      .addCase(loginUser.fulfilled, (state, action) => {
-        state.user = action.payload;
+      .addCase(loginUser.fulfilled, (state, { payload }) => {
+        state.user = payload;
         state.isAuthenticated = true;
         state.isAuthChecked = true;
         state.requestStatus = 'succeeded';
+        state.error = undefined;
       })
-      .addCase(loginUser.rejected, (state, action) => {
+      .addCase(loginUser.rejected, (state, { error }) => {
         state.requestStatus = 'failed';
+        if (error.message) {
+          state.error = error.message;
+        }
       })
       .addCase(loginUser.pending, (state) => {
         state.requestStatus = 'pending';
@@ -161,9 +167,13 @@ const slice = createSlice({
         state.isAuthChecked = true;
         state.isAuthenticated = false;
         state.requestStatus = 'succeeded';
+        state.error = undefined;
       })
-      .addCase(logoutUser.rejected, (state, action) => {
+      .addCase(logoutUser.rejected, (state, { error }) => {
         state.requestStatus = 'failed';
+        if (error.message) {
+          state.error = error.message;
+        }
       })
       .addCase(logoutUser.pending, (state) => {
         state.requestStatus = 'pending';
