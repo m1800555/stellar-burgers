@@ -16,7 +16,7 @@ export function ProtectedRoute({ children, onlyUnauthorized }: ProtectedRoutePro
   const requestStatus = useSelector(getRequestStatus);
   const authChecked = useSelector(isAuthChecked);
 
-  if ((!authChecked && user !== null) || requestStatus === 'pending') {
+  if (!authChecked || requestStatus === 'pending') {
     return <Preloader />;
   }
 

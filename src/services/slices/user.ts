@@ -188,5 +188,5 @@ export const {
   isAuthenticated,
   getError
 } = slice.selectors;
-export const { setUser } = slice.actions;
+export const { setAuthChecked, setUser } = slice.actions;
 export default slice.reducer;

@@ -23,7 +23,7 @@ import { getCookie } from '../../utils/cookie';
 import { useDispatch } from '../../services/store';
 import { clearSelectedOrder } from '../../services/slices/feed';
 import { getIngredients } from '../../services/slices/ingredients';
-import { getUser } from '../../services/slices/user';
+import { getUser, setAuthChecked } from '../../services/slices/user';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -48,6 +48,8 @@ const App = () => {
     const token = getCookie('accessToken');
     if (token) {
       dispatch(getUser());
+    } else {
+      dispatch(setAuthChecked());
     }
   }, []);
 
