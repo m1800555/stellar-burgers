@@ -5,11 +5,11 @@ import {
 } from 'react-redux';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
-import burgerConstructorReducer from './slices/burger-constructor';
-import ingredientsReducer from './slices/ingredients';
-import feedReducer from './slices/feed';
-import ordersReducer from './slices/orders';
-import userReducer from './slices/user';
+import { burgerConstructorReducer } from './slices/burger-constructor';
+import { ingredientsReducer } from './slices/ingredients';
+import { feedReducer } from './slices/feed';
+import { ordersReducer } from './slices/orders';
+import { userReducer } from './slices/user';
 
 export const rootReducer = combineReducers({
   burgerConstructor: burgerConstructorReducer,
@@ -19,7 +19,7 @@ export const rootReducer = combineReducers({
   user: userReducer,
 });
 
-const store = configureStore({
+export const store = configureStore({
   reducer: rootReducer,
   devTools: process.env.NODE_ENV !== 'production'
 });

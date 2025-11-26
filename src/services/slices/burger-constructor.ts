@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { TIngredient, TConstructorIngredient } from '../../utils/types';
 
-type TConstructorState = {
+export type TConstructorState = {
   bun: TConstructorIngredient | null;
   ingredients: TConstructorIngredient[];
 };
@@ -53,4 +53,4 @@ export const {
   reorderConstructor,
   clearConstructor
 } = slice.actions;
-export default slice.reducer;
+export const burgerConstructorReducer = slice.reducer;

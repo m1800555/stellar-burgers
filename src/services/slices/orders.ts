@@ -3,18 +3,20 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getOrderByNumberApi, getOrdersApi, orderBurgerApi } from '@api';
 import { TOrder } from './../../utils/types';
 
-type TOrdersState = {
+export type TOrdersState = {
   orders: TOrder[];
   orderModalData: TOrder | null;
   orderRequest: boolean;
   isLoading: boolean;
+  error: string | undefined;
 };
 
-const initialState: TOrdersState = {
+export const initialState: TOrdersState = {
   orders: [],
   orderModalData: null,
   orderRequest: false,
-  isLoading: false
+  isLoading: false,
+  error: undefined
 };
 
 export const getOrders = createAsyncThunk(
@@ -65,16 +67,19 @@ export const slice = createSlice({
     getAllOrders: (state) => state.orders,
     getOrderModalData: (state) => state.orderModalData,
     getOrderRequest: (state) => state.orderRequest,
-    getIsLoading: (state) => state.isLoading
+    getIsLoading: (state) => state.isLoading,
+    getError: (state) => state.error
   },
   extraReducers: (builder) => {
     builder
       .addCase(getOrders.fulfilled, (state, action) => {
         state.orders = action.payload;
         state.isLoading = false;
+        state.error = undefined;
       })
-      .addCase(getOrders.rejected, (state) => {
+      .addCase(getOrders.rejected, (state, action) => {
         state.isLoading = false;
+        state.error = action.error.message || 'Не удалось загрузить заказы';
       })
       .addCase(getOrders.pending, (state) => {
         state.isLoading = true;
@@ -84,24 +89,28 @@ export const slice = createSlice({
       .addCase(getOrder.fulfilled, (state, action) => {
         state.orders = [action.payload];
         state.isLoading = false;
+        state.error = undefined;
       })
-      .addCase(getOrder.rejected, (state) => {
+      .addCase(getOrder.rejected, (state, action) => {
         state.isLoading = false;
+        state.error = action.error.message || 'Не удалось загрузить заказ';
       })
       .addCase(getOrder.pending, (state) => {
         state.isLoading = true;
       });
 
-      builder
+    builder
       .addCase(createOrder.fulfilled, (state, action) => {
         state.orders.push(action.payload.order);
         state.orderModalData = action.payload.order;
         state.orderRequest = false;
         state.isLoading = false;
+        state.error = undefined;
       })
-      .addCase(createOrder.rejected, (state) => {
+      .addCase(createOrder.rejected, (state, action) => {
         state.orderRequest = false;
         state.isLoading = false;
+        state.error = action.error.message || 'Не удалось создать заказ';
       })
       .addCase(createOrder.pending, (state) => {
         state.orderRequest = true;
@@ -114,7 +123,8 @@ export const {
   getAllOrders,
   getOrderModalData,
   getOrderRequest,
-  getIsLoading
+  getIsLoading,
+  getError
 } = slice.selectors;
 export const { resetOrderModelData } = slice.actions;
-export default slice.reducer;
+export const ordersReducer = slice.reducer;

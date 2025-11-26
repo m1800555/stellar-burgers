@@ -6,11 +6,13 @@ import { TIngredient } from '../../utils/types';
 type TIngredientState = {
   ingredients: TIngredient[];
   isLoading: boolean;
+  error: string | undefined;
 };
 
-const initialState: TIngredientState = {
+export const initialState: TIngredientState = {
   ingredients: [],
-  isLoading: false
+  isLoading: false,
+  error: undefined
 };
 
 export const getIngredients = createAsyncThunk(
@@ -24,16 +26,19 @@ export const slice = createSlice({
   reducers: {},
   selectors: {
     getAllIngredients: (state) => state.ingredients,
-    getIngredientsLoading: (state) => state.isLoading
+    getIsLoading: (state) => state.isLoading,
+    getError: (state) => state.error
   },
   extraReducers: (builder) => {
     builder
       .addCase(getIngredients.fulfilled, (state, action) => {
         state.ingredients = action.payload;
         state.isLoading = false;
+        state.error = undefined;
       })
-      .addCase(getIngredients.rejected, (state) => {
+      .addCase(getIngredients.rejected, (state, action) => {
         state.isLoading = false;
+        state.error = action.error.message || 'Не удалось загрузить ингредиенты';
       })
       .addCase(getIngredients.pending, (state) => {
         state.isLoading = true;
@@ -41,5 +46,5 @@ export const slice = createSlice({
   }
 });
 
-export const { getAllIngredients, getIngredientsLoading } = slice.selectors;
-export default slice.reducer;
+export const { getAllIngredients, getIsLoading, getError } = slice.selectors;
+export const ingredientsReducer = slice.reducer;

@@ -9,14 +9,16 @@ type TFeedState = {
   totalToday: number;
   selectedOrder: TOrder | null;
   isLoading: boolean;
+  error: string | undefined;
 };
 
-const initialState: TFeedState = {
+export const initialState: TFeedState = {
   orders: [],
   total: 0,
   totalToday: 0,
   selectedOrder: null,
-  isLoading: false
+  isLoading: false,
+  error: undefined
 };
 
 export const getFeeds = createAsyncThunk(
@@ -42,7 +44,8 @@ export const slice = createSlice({
     getTotal: (state) => state.total,
     getTotalToday: (state) => state.totalToday,
     getSelectedFeed: (state) => state.selectedOrder,
-    getIsLoading: (state) => state.isLoading
+    getIsLoading: (state) => state.isLoading,
+    getError: (state) => state.error
   },
   extraReducers: (builder) => {
     builder
@@ -51,12 +54,14 @@ export const slice = createSlice({
         state.total = action.payload.total;
         state.totalToday = action.payload.totalToday;
         state.isLoading = false;
+        state.error = undefined;
       })
       .addCase(getOrderByNumber.fulfilled, (state, action) => {
         state.selectedOrder = action.payload.orders[0];
       })
-      .addCase(getFeeds.rejected, (state) => {
+      .addCase(getFeeds.rejected, (state, action) => {
         state.isLoading = false;
+        state.error = action.error.message || 'Не удалось загрузить заказы';
       })
       .addCase(getFeeds.pending, (state) => {
         state.isLoading = true;
@@ -69,7 +74,8 @@ export const {
   getTotal,
   getTotalToday,
   getSelectedFeed,
-  getIsLoading
+  getIsLoading,
+  getError
 } = slice.selectors;
 export const { clearSelectedOrder } = slice.actions;
-export default slice.reducer;
+export const feedReducer = slice.reducer;
