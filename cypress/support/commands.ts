@@ -1,37 +1,35 @@
-/// <reference types="cypress" />
-// ***********************************************
-// This example commands.ts shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-//
-// declare global {
-//   namespace Cypress {
-//     interface Chainable {
-//       login(email: string, password: string): Chainable<void>
-//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
-//     }
-//   }
-// }
+/// <reference types = "cypress"/>
+
+type TCheckModalType = 'exist' | 'not.exist';
+
+const MODAL = '[data-cy="modal"]';
+
+Cypress.Commands.add('addIngredient', (id, name) => {
+  cy.contains('Выберите начинку').should('exist');
+  cy.get(`[data-cy="ingredient-${id}"]`).children('button').click();
+  cy.get('[data-cy="constructor-ingredients"]').should('contain', name);
+  cy.contains('Выберите начинку').should('not.exist');
+});
+
+Cypress.Commands.add('checkModal', (checkType: TCheckModalType) => {
+  cy.get(MODAL).should(checkType);
+});
+
+Cypress.Commands.add('closeModal', () => {
+  cy.get(MODAL).as('modal')
+  cy.get('@modal').should('exist');
+  cy.get('@modal').find('[data-cy="modal-close-button"]').click();
+  cy.get('@modal').should('not.exist');
+});
+
+export {}
+
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      addIngredient(id: string, name: string): Chainable<void>;
+      checkModal(check: TCheckModalType): Chainable<void>;
+      closeModal(): Chainable<void>;
+    }
+  }
+}
