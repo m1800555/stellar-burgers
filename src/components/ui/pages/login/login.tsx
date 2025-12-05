@@ -1,12 +1,13 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
+import { Link } from 'react-router-dom';
 import {
-  Input,
   Button,
+  Input,
   PasswordInput
 } from '@zlden/react-developer-burger-ui-components';
-import styles from '../common.module.css';
-import { Link } from 'react-router-dom';
+
 import { LoginUIProps } from './type';
+import styles from '../common.module.css';
 
 export const LoginUI: FC<LoginUIProps> = ({
   email,
@@ -35,6 +36,7 @@ export const LoginUI: FC<LoginUIProps> = ({
               error={false}
               errorText=''
               size='default'
+              autoComplete='current-email'
             />
           </div>
           <div className='pb-6'>
@@ -42,6 +44,7 @@ export const LoginUI: FC<LoginUIProps> = ({
               onChange={(e) => setPassword(e.target.value)}
               value={password}
               name='password'
+              autoComplete='current-password'
             />
           </div>
           <div className={`pb-6 ${styles.button}`}>
